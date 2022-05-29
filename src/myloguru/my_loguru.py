@@ -2,28 +2,40 @@ import os
 import datetime
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Union, Any
 
 from loguru import logger
 from loguru._logger import Logger
 
 
 class MyLogger:
-    PATH = Path(__file__).resolve().parent
     TODAY = datetime.datetime.today().strftime("%Y-%m-%d")
-    LOGGING_DIRECTORY = os.path.join(PATH, '../logs', TODAY)
-    LOGGING_LEVEL = int(os.getenv("LOGGING_LEVEL", 1))
     levels: List[dict] = None
 
-    def __init__(self, logger: 'logger', dir_path: str = ''):
-        if dir_path:
-            self.LOGGING_DIRECTORY = os.path.join(dir_path, '../logs', self.TODAY)
-        self._logger: logger = logger
+    def __init__(
+            self,
+            logger: 'Logger',
+            parent_dir: str = Path(__file__).resolve().parent,
+            logs_dir: str = 'logs',
+            date_dir: bool = True,
+            default_log_level: int = int(os.getenv("LOGGING_LEVEL", 1))
+    ):
+        self.LOGGING_DIRECTORY: str = os.path.join(parent_dir, logs_dir)
+        if date_dir:
+            current_date: str = datetime.datetime.today().strftime("%Y-%m-%d")
+            self.LOGGING_DIRECTORY: str = os.path.join(self.LOGGING_DIRECTORY, current_date)
+        self._logger: Logger = logger
+        self.LOGGING_LEVEL: int = default_log_level
         self._logger.remove()
         self.get_default()
 
     def add_level(self, name: str, color: str = "<white>", no: int = 0, log_filename: str = ''):
-        """Add new logging level to loguru.logger config"""
+        """Add new logging level to loguru.logger config
+        :param name - logging level name
+        :param color  - color for logging level
+        :param no - minimal logging level
+        :param log_filename - filename for current level
+        """
 
         if self.levels is None:
             self.levels = []
@@ -39,10 +51,15 @@ class MyLogger:
         self.levels.append(level_data)
 
     def add_logger(self, **kwargs):
-        """Add new logging settings to loguru.logger"""
+        """Add new logging settings to loguru.logger
+        :param level int | str - logging level (level=5 or level="DEBUG")
+        :param sink - interace for logging out (filepath, stdout, etc),
+            default: 'parent_dir/logs/date_dir/"level_name".log
+        :param: More read loguru docs
+        """
 
-        level = kwargs.get("level", self.LOGGING_LEVEL)
-        sink = kwargs.get("sink")
+        level: Union[int, str] = kwargs.get("level", self.LOGGING_LEVEL)
+        sink: Any = kwargs.get("sink")
         if not sink:
             sink: str = [elem for elem in self.levels if elem["config"]["name"] == level][0]["path"]
             kwargs.update(sink=sink)
@@ -85,3 +102,4 @@ class MyLogger:
 
 
 logger: 'Logger' = MyLogger(logger).get_new_logger()
+
