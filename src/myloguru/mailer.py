@@ -1,4 +1,4 @@
-from .my_loguru import logger, MyLogger
+from myloguru.my_loguru import MyLogger, logger
 
 
 class MailerLogger(MyLogger):
@@ -26,4 +26,5 @@ class MailerLogger(MyLogger):
         return self
 
 
-logger: MailerLogger = MailerLogger(logger).get_new_logger()
+def get_logger() -> MailerLogger:
+    return MailerLogger(logger).get_default().get_new_logger()

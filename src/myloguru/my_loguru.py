@@ -1,7 +1,6 @@
 import os
 import datetime
 import sys
-from pathlib import Path
 from typing import List, Union, Any
 
 from loguru import logger
@@ -9,13 +8,11 @@ from loguru._logger import Logger
 
 
 class MyLogger:
-    TODAY = datetime.datetime.today().strftime("%Y-%m-%d")
-    levels: List[dict] = None
 
     def __init__(
             self,
-            logger: 'Logger',
-            parent_dir: str = Path(__file__).resolve().parent,
+            logger: 'logger',
+            parent_dir: str = '',
             logs_dir: str = 'logs',
             date_dir: bool = True,
             default_log_level: int = int(os.getenv("LOGGING_LEVEL", 1))
@@ -24,10 +21,10 @@ class MyLogger:
         if date_dir:
             current_date: str = datetime.datetime.today().strftime("%Y-%m-%d")
             self.LOGGING_DIRECTORY: str = os.path.join(self.LOGGING_DIRECTORY, current_date)
-        self._logger: Logger = logger
         self.LOGGING_LEVEL: int = default_log_level
+        self.levels: List[dict] = []
+        self._logger: logger = logger
         self._logger.remove()
-        self.get_default()
 
     def add_level(self, name: str, color: str = "<white>", no: int = 0, log_filename: str = ''):
         """Add new logging level to loguru.logger config
@@ -37,7 +34,7 @@ class MyLogger:
         :param log_filename - filename for current level
         """
 
-        if self.levels is None:
+        if not self.levels:
             self.levels = []
         if not log_filename:
             log_filename = f'{name.lower()}.log'
@@ -47,8 +44,14 @@ class MyLogger:
         }
         if no:
             level_data["config"].update(no=no)
-        self._logger.configure(levels=[level_data["config"]])
         self.levels.append(level_data)
+        if self._is_level_exists(name):
+            return
+        self._logger.configure(levels=[level_data["config"]])
+
+    def _is_level_exists(self, name: str) -> bool:
+        level_names = tuple(level.get("config", {}).get("name") for level in self.levels)
+        return name in level_names
 
     def add_logger(self, **kwargs):
         """Add new logging settings to loguru.logger
@@ -57,8 +60,9 @@ class MyLogger:
             default: 'parent_dir/logs/date_dir/"level_name".log
         :param: More read loguru docs
         """
-
         level: Union[int, str] = kwargs.get("level", self.LOGGING_LEVEL)
+        if self._is_level_exists(level):
+            return
         sink: Any = kwargs.get("sink")
         if not sink:
             sink: str = [elem for elem in self.levels if elem["config"]["name"] == level][0]["path"]
@@ -101,5 +105,5 @@ class MyLogger:
         return self
 
 
-logger: 'Logger' = MyLogger(logger).get_new_logger()
-
+def get_logger() -> 'Logger':
+    return MyLogger(logger).get_default().get_new_logger()
