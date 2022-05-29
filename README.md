@@ -1,2 +1,1 @@
-# my_loguru
-my_loguru
+My personal loguru config

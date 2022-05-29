@@ -1,0 +1,4 @@
+build==0.8.0
+loguru==0.5.3
+pytest==7.1.2
+twine==4.0.0
