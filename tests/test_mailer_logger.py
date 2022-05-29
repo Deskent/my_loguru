@@ -1,4 +1,4 @@
-from src.mailer import logger
+from myloguru.mailer import logger
 
 
 def test_my_logger():

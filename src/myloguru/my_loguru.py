@@ -11,7 +11,7 @@ from loguru._logger import Logger
 class MyLogger:
     PATH = Path(__file__).resolve().parent
     TODAY = datetime.datetime.today().strftime("%Y-%m-%d")
-    LOGGING_DIRECTORY = os.path.join(PATH, 'logs', TODAY)
+    LOGGING_DIRECTORY = os.path.join(PATH, '../logs', TODAY)
     LOGGING_LEVEL = int(os.getenv("LOGGING_LEVEL", 1))
     levels: List[dict] = None
 

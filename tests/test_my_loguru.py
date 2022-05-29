@@ -1,4 +1,4 @@
-from src.my_loguru import logger
+from myloguru.my_loguru import logger
 
 
 def test_my_logger():
