@@ -1,4 +1,4 @@
-from my_loguru import logger, MyLogger
+from .my_loguru import logger, MyLogger
 
 
 class MailerLogger(MyLogger):

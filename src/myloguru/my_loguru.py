@@ -15,7 +15,9 @@ class MyLogger:
     LOGGING_LEVEL = int(os.getenv("LOGGING_LEVEL", 1))
     levels: List[dict] = None
 
-    def __init__(self, logger: 'logger'):
+    def __init__(self, logger: 'logger', dir_path: str = ''):
+        if dir_path:
+            self.LOGGING_DIRECTORY = os.path.join(dir_path, '../logs', self.TODAY)
         self._logger: logger = logger
         self._logger.remove()
         self.get_default()

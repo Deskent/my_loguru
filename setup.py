@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='myloguru-deskent',
-    version='0.0.3',
+    version='0.0.4',
     author='Deskent',
     author_email='battenetciz@gmail.com',
     description='My loguru config',
