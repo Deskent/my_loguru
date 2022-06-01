@@ -15,7 +15,7 @@ class MyLogger:
             parent_dir: str = '',
             logs_dir: str = 'logs',
             date_dir: bool = True,
-            default_log_level: int = int(os.getenv("LOGGING_LEVEL", 1))
+            default_log_level: int = int(os.getenv("LOGGING_LEVEL", 20))
     ):
         self.LOGGING_DIRECTORY: str = os.path.join(parent_dir, logs_dir)
         if date_dir:
@@ -105,5 +105,5 @@ class MyLogger:
         return self
 
 
-def get_logger() -> 'Logger':
-    return MyLogger(logger).get_default().get_new_logger()
+def get_logger(level: int) -> 'Logger':
+    return MyLogger(logger=logger, default_log_level=level).get_default().get_new_logger()
