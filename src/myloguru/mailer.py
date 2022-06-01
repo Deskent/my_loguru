@@ -1,4 +1,5 @@
-from myloguru.my_loguru import MyLogger, logger
+from myloguru.my_loguru import MyLogger
+from loguru import logger as default_logger
 
 
 class MailerLogger(MyLogger):
@@ -27,4 +28,4 @@ class MailerLogger(MyLogger):
 
 
 def get_logger() -> MailerLogger:
-    return MailerLogger(logger).get_default().get_new_logger()
+    return MailerLogger(default_logger).get_default().get_new_logger()

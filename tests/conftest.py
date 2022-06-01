@@ -2,6 +2,7 @@ import datetime
 import os
 import shutil
 import pytest
+from myloguru.my_loguru import get_logger, Logger
 
 
 @pytest.fixture(scope='session')
@@ -19,3 +20,8 @@ def delete_logs_dir():
 @pytest.fixture(scope='session')
 def current_date() -> str:
     return datetime.datetime.today().strftime("%Y-%m-%d")
+
+
+@pytest.fixture(scope='function')
+def test_logger() -> 'Logger':
+    return get_logger()
