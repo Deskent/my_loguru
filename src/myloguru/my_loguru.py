@@ -3,7 +3,7 @@ import datetime
 import sys
 from typing import List, Union, Any
 
-from loguru import logger
+from loguru import logger as default_logger
 from loguru._logger import Logger
 
 
@@ -11,19 +11,19 @@ class MyLogger:
 
     def __init__(
             self,
-            logger: 'logger',
+            logger: 'Logger',
             parent_dir: str = '',
             logs_dir: str = 'logs',
             date_dir: bool = True,
-            default_log_level: int = int(os.getenv("LOGGING_LEVEL", 20))
+            default_log_level: int = 0
     ):
         self.LOGGING_DIRECTORY: str = os.path.join(parent_dir, logs_dir)
         if date_dir:
             current_date: str = datetime.datetime.today().strftime("%Y-%m-%d")
             self.LOGGING_DIRECTORY: str = os.path.join(self.LOGGING_DIRECTORY, current_date)
-        self.LOGGING_LEVEL: int = default_log_level
+        self.LOGGING_LEVEL: int = default_log_level or int(os.getenv("LOGGING_LEVEL", 20))
         self.levels: List[dict] = []
-        self._logger: logger = logger
+        self._logger: 'Logger' = logger
         self._logger.remove()
 
     def add_level(self, name: str, color: str = "<white>", no: int = 0, log_filename: str = ''):
@@ -100,10 +100,10 @@ class MyLogger:
         self.add_level("WARNING", "<light-yellow>")
         self.add_level("ERROR", "<red>")
         self.add_logger(enqueue=True, level='ERROR', rotation="50 MB")
-        self.add_logger(sink=sys.stdout)
+        self.add_logger(sink=sys.stdout, level=self.LOGGING_LEVEL)
 
         return self
 
 
-def get_logger(level: int) -> 'Logger':
-    return MyLogger(logger=logger, default_log_level=level).get_default().get_new_logger()
+def get_logger(level: int = 20) -> 'Logger':
+    return MyLogger(logger=default_logger, default_log_level=level).get_default().get_new_logger()
