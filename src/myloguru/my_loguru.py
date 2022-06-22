@@ -11,20 +11,23 @@ class MyLogger:
 
     def __init__(
             self,
-            logger: 'Logger',
+            logger: 'Logger' = default_logger,
             parent_dir: str = '',
             logs_dir: str = 'logs',
             date_dir: bool = True,
-            default_log_level: int = 0
+            serialize: bool = False,
+            level: int = 1
     ):
-        self.LOGGING_DIRECTORY: str = os.path.join(parent_dir, logs_dir)
+        parent_dir: str = parent_dir if parent_dir else os.getcwd()
+        self._LOGGING_DIRECTORY: str = os.path.join(parent_dir, logs_dir)
         if date_dir:
             current_date: str = datetime.datetime.today().strftime("%Y-%m-%d")
-            self.LOGGING_DIRECTORY: str = os.path.join(self.LOGGING_DIRECTORY, current_date)
-        self.LOGGING_LEVEL: int = default_log_level or int(os.getenv("LOGGING_LEVEL", 20))
+            self._LOGGING_DIRECTORY: str = os.path.join(self._LOGGING_DIRECTORY, current_date)
+        self.serialize: bool = serialize
+        self._LOGGING_LEVEL: int = level
         self.levels: List[dict] = []
         self._logger: 'Logger' = logger
-        self._logger.remove()
+        self.logger.remove()
 
     def add_level(self, name: str, color: str = "<white>", no: int = 0, log_filename: str = ''):
         """Add new logging level to loguru.logger config
@@ -34,20 +37,17 @@ class MyLogger:
         :param log_filename - filename for current level
         """
 
-        if not self.levels:
-            self.levels = []
         if not log_filename:
-            log_filename = f'{name.lower()}.log'
+            log_filename = f'{name}.log'.lower()
         level_data: dict = {
             "config": {"name": name, "color": color},
-            "path": os.path.join(self.LOGGING_DIRECTORY, log_filename)
+            "path": os.path.join(self._LOGGING_DIRECTORY, log_filename)
         }
         if no:
             level_data["config"].update(no=no)
         self.levels.append(level_data)
-        if self._is_level_exists(name):
-            return
-        self._logger.configure(levels=[level_data["config"]])
+        if not self._is_level_exists(name):
+            self.logger.configure(levels=[level_data["config"]])
 
     def _is_level_exists(self, name: str) -> bool:
         level_names = tuple(level.get("config", {}).get("name") for level in self.levels)
@@ -60,37 +60,39 @@ class MyLogger:
             default: 'parent_dir/logs/date_dir/"level_name".log
         :param: More read loguru docs
         """
-        level: Union[int, str] = kwargs.get("level", self.LOGGING_LEVEL)
-        if self._is_level_exists(level):
-            return
+
+        level: Union[int, str] = kwargs.get("level", self._LOGGING_LEVEL)
         sink: Any = kwargs.get("sink")
         if not sink:
             sink: str = [elem for elem in self.levels if elem["config"]["name"] == level][0]["path"]
             kwargs.update(sink=sink)
-        self._logger.add(**kwargs)
+        self.logger.add(**kwargs)
+
+    def trace(self, *args, **kwargs):
+        return self.logger.trace(*args, **kwargs)
 
     def catch(self, *args, **kwargs):
-        return self._logger.catch(*args, **kwargs)
+        return self.logger.catch(*args, **kwargs)
 
     def info(self, text, *args, **kwargs):
-        return self._logger.info(text, *args, **kwargs)
+        return self.logger.info(text, *args, **kwargs)
 
     def debug(self, text, *args, **kwargs):
-        return self._logger.debug(text, *args, **kwargs)
+        return self.logger.debug(text, *args, **kwargs)
 
     def error(self, text, *args, **kwargs):
-        return self._logger.error(text, *args, **kwargs)
+        return self.logger.error(text, *args, **kwargs)
 
     def warning(self, text, *args, **kwargs):
-        return self._logger.warning(text, *args, **kwargs)
+        return self.logger.warning(text, *args, **kwargs)
 
     def success(self, text, *args, **kwargs):
-        return self._logger.success(text, *args, **kwargs)
+        return self.logger.success(text, *args, **kwargs)
 
     def get_new_logger(self) -> 'Logger':
         """Returns updated loguru.logger instance"""
 
-        return self._logger
+        return self.logger
 
     def get_default(self) -> 'MyLogger':
         """Returns self instance with default settings"""
@@ -99,11 +101,31 @@ class MyLogger:
         self.add_level("INFO", "<fg #afffff>")
         self.add_level("WARNING", "<light-yellow>")
         self.add_level("ERROR", "<red>")
+        self.add_logger(enqueue=True, level='DEBUG', rotation="50 MB")
+        self.add_logger(enqueue=True, level='WARNING', rotation="50 MB")
         self.add_logger(enqueue=True, level='ERROR', rotation="50 MB")
-        self.add_logger(sink=sys.stdout, level=self.LOGGING_LEVEL)
+        if self.serialize:
+            self.add_logger(enqueue=True, level='ERROR', rotation="50 MB", serialize=True)
+        self.add_logger(sink=sys.stdout, level=self._LOGGING_LEVEL)
 
         return self
 
+    @property
+    def logger(self) -> 'Logger':
+        return self._logger
 
-def get_logger(level: int = 20) -> 'Logger':
-    return MyLogger(logger=default_logger, default_log_level=level).get_default().get_new_logger()
+
+def get_logger(
+        level: int = 20,
+        parent_dir: str = '',
+        logs_dir: str = 'logs',
+        add_date_dir: bool = True,
+        serialize_errors: bool = False
+) -> 'Logger':
+    return (
+        MyLogger(
+            logger=default_logger, level=level, parent_dir=parent_dir, logs_dir=logs_dir,
+            date_dir=add_date_dir, serialize=serialize_errors
+        ).get_default()
+        .get_new_logger()
+    )
