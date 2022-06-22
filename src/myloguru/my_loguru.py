@@ -124,7 +124,7 @@ def get_logger(
 ) -> 'Logger':
     return (
         MyLogger(
-            logger=default_logger, level=level, parent_dir=parent_dir, logs_dir=logs_dir,
+            level=level, parent_dir=parent_dir, logs_dir=logs_dir,
             date_dir=add_date_dir, serialize=serialize_errors
         ).get_default()
         .get_new_logger()
