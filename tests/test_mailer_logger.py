@@ -1,8 +1,6 @@
 import os
 
-import pytest
-
-from myloguru.mailer import MailerLogger, get_mailer_logger
+from myloguru.mailer import get_mailer_logger
 
 
 def test_mailer_logger_admin(delete_logs_dir, current_date):

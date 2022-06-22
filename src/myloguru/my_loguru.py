@@ -1,3 +1,6 @@
+"""
+version 0.0.10
+"""
 import os
 import datetime
 import sys
