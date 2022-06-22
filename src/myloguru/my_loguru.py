@@ -27,7 +27,6 @@ class MyLogger:
         self._LOGGING_LEVEL: int = level
         self.levels: List[dict] = []
         self._logger: 'Logger' = logger
-        self.logger.remove()
 
     def add_level(self, name: str, color: str = "<white>", no: int = 0, log_filename: str = ''):
         """Add new logging level to loguru.logger config
@@ -45,9 +44,9 @@ class MyLogger:
         }
         if no:
             level_data["config"].update(no=no)
-        self.levels.append(level_data)
         if not self._is_level_exists(name):
-            self.logger.configure(levels=[level_data["config"]])
+            self._logger.configure(levels=[level_data["config"]])
+        self.levels.append(level_data)
 
     def _is_level_exists(self, name: str) -> bool:
         level_names = tuple(level.get("config", {}).get("name") for level in self.levels)
@@ -92,11 +91,12 @@ class MyLogger:
     def get_new_logger(self) -> 'Logger':
         """Returns updated loguru.logger instance"""
 
-        return self.logger
+        return self._logger
 
     def get_default(self) -> 'MyLogger':
         """Returns self instance with default settings"""
 
+        self._logger.remove()
         self.add_level("DEBUG", "<white>")
         self.add_level("INFO", "<fg #afffff>")
         self.add_level("WARNING", "<light-yellow>")
