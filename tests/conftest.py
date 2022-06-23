@@ -24,4 +24,4 @@ def current_date() -> str:
 
 @pytest.fixture(scope='function')
 def test_logger() -> 'Logger':
-    return get_logger()
+    return get_logger(level=1)
