@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
-
+exec(open("src/myloguru/_resources.py").read())
 setup(
     name='myloguru-deskent',
-    version='0.0.10',
-    author='Deskent',
+    version=__version__,
+    author=__author__,
     author_email='battenetciz@gmail.com',
     description='My loguru config',
     install_requires=[
