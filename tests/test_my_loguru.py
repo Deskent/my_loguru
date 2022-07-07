@@ -17,6 +17,7 @@ def test_set_log_level(current_date):
 
 
 def test_my_logger(delete_logs_dir, test_logger):
+    assert test_logger.log("INFO", "test") is None
     assert test_logger.info("test") is None
     assert test_logger.warning("test") is None
     assert test_logger.debug("test") is None

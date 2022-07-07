@@ -70,6 +70,9 @@ class MyLogger:
             kwargs.update(sink=sink)
         self.logger.add(**kwargs)
 
+    def log(self, *args, **kwargs):
+        return self.logger.log(*args, **kwargs)
+
     def trace(self, *args, **kwargs):
         return self.logger.trace(*args, **kwargs)
 
