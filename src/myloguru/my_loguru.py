@@ -1,6 +1,3 @@
-"""
-version 0.0.10
-"""
 import os
 import datetime
 import sys
@@ -25,13 +22,16 @@ class MyLogger:
         self._LOGGING_DIRECTORY: str = os.path.join(parent_dir, logs_dir)
         if date_dir:
             current_date: str = datetime.datetime.today().strftime("%Y-%m-%d")
-            self._LOGGING_DIRECTORY: str = os.path.join(self._LOGGING_DIRECTORY, current_date)
+            self._LOGGING_DIRECTORY: str = os.path.join(
+                self._LOGGING_DIRECTORY, current_date)
         self.serialize: bool = serialize
         self._LOGGING_LEVEL: int = level
         self.levels: List[dict] = []
         self._logger: 'Logger' = logger
 
-    def add_level(self, name: str, color: str = "<white>", no: int = 0, log_filename: str = ''):
+    def add_level(
+            self, name: str, color: str = "<white>", no: int = 0,
+            log_filename: str = ''):
         """Add new logging level to loguru.logger config
         :param name - logging level name
         :param color  - color for logging level
@@ -52,7 +52,8 @@ class MyLogger:
         self.levels.append(level_data)
 
     def _is_level_exists(self, name: str) -> bool:
-        level_names = tuple(level.get("config", {}).get("name") for level in self.levels)
+        level_names = tuple(level.get("config", {}).get("name")
+                            for level in self.levels)
         return name in level_names
 
     def add_logger(self, **kwargs):
@@ -66,7 +67,10 @@ class MyLogger:
         level: Union[int, str] = kwargs.get("level", self._LOGGING_LEVEL)
         sink: Any = kwargs.get("sink")
         if not sink:
-            sink: str = [elem for elem in self.levels if elem["config"]["name"] == level][0]["path"]
+            sink: str = tuple(
+                elem
+                for elem in self.levels
+                if elem["config"]["name"] == level)[0]["path"]
             kwargs.update(sink=sink)
         self.logger.add(**kwargs)
 
@@ -114,7 +118,8 @@ class MyLogger:
         self.add_logger(enqueue=True, level='WARNING', rotation="50 MB")
         self.add_logger(enqueue=True, level='ERROR', rotation="50 MB")
         if self.serialize:
-            self.add_logger(enqueue=True, level='ERROR', rotation="50 MB", serialize=True)
+            self.add_logger(
+                enqueue=True, level='ERROR', rotation="50 MB", serialize=True)
         self.add_logger(sink=sys.stdout, level=self._LOGGING_LEVEL)
 
         return self
