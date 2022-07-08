@@ -94,6 +94,9 @@ class MyLogger:
     def success(self, text, *args, **kwargs):
         return self.logger.success(text, *args, **kwargs)
 
+    def exception(self, text, *args, **kwargs):
+        return self.logger.exception(text, *args, **kwargs)
+
     def get_new_logger(self) -> 'Logger':
         """Returns updated loguru.logger instance"""
 

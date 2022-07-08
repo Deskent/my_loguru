@@ -1,7 +1,8 @@
 import datetime
 import os
 
-from myloguru.my_loguru import MyLogger, get_logger
+from myloguru.my_loguru import MyLogger
+from myloguru import get_logger
 from loguru import logger
 
 
@@ -17,12 +18,13 @@ def test_set_log_level(current_date):
 
 
 def test_my_logger(delete_logs_dir, test_logger):
-    assert test_logger.log("INFO", "test") is None
-    assert test_logger.info("test") is None
-    assert test_logger.warning("test") is None
-    assert test_logger.debug("test") is None
-    assert test_logger.error("test") is None
-    assert test_logger.success("test") is None
+    assert test_logger.log("INFO", "test log") is None
+    assert test_logger.info("test info") is None
+    assert test_logger.warning("test warning") is None
+    assert test_logger.debug("test debug") is None
+    assert test_logger.error("test error") is None
+    assert test_logger.success("test success") is None
+    assert test_logger.exception("test exception") is None
 
 
 def test_my_logger_with_another_logs_dir(delete_logs_dir):
