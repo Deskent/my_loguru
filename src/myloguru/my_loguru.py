@@ -70,7 +70,8 @@ class MyLogger:
             sink: str = tuple(
                 elem
                 for elem in self.levels
-                if elem["config"]["name"] == level)[0]["path"]
+                if elem["config"]["name"] == level
+            )[0]["path"]
             kwargs.update(sink=sink)
         self.logger.add(**kwargs)
 
@@ -109,18 +110,17 @@ class MyLogger:
     def get_default(self) -> 'MyLogger':
         """Returns self instance with default settings"""
 
-        self._logger.remove()
+        self._logger.remove(0)
         self.add_level("DEBUG", "<white>")
         self.add_level("INFO", "<fg #afffff>")
         self.add_level("WARNING", "<light-yellow>")
         self.add_level("ERROR", "<red>")
-        self.add_logger(enqueue=True, level='DEBUG', rotation="50 MB")
+        self.add_logger(sink=sys.stdout, level='DEBUG')
         self.add_logger(enqueue=True, level='WARNING', rotation="50 MB")
         self.add_logger(enqueue=True, level='ERROR', rotation="50 MB")
         if self.serialize:
             self.add_logger(
                 enqueue=True, level='ERROR', rotation="50 MB", serialize=True)
-        self.add_logger(sink=sys.stdout, level=self._LOGGING_LEVEL)
 
         return self
 
