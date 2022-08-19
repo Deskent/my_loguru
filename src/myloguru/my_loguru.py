@@ -110,7 +110,7 @@ class MyLogger:
     def get_default(self) -> 'MyLogger':
         """Returns self instance with default settings"""
 
-        self._logger.remove(0)
+        self._logger.remove()
         self.add_level("DEBUG", "<white>")
         self.add_level("INFO", "<fg #afffff>")
         self.add_level("WARNING", "<light-yellow>")
